@@ -1,0 +1,1 @@
+kubectl apply -f pyrador-configmap.yaml,pyrador-secret.yaml,pyrador-deployment,pyrador-service.yaml
