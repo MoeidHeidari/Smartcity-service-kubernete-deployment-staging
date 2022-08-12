@@ -1,0 +1,1 @@
+# Smartcity-service-kubernete-deployment
