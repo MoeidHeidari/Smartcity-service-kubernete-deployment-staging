@@ -1,0 +1,172 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  annotations:
+    kompose.cmd: kompose convert
+    kompose.version: 1.26.1 (a9d05d509)
+  labels:
+    io.kompose.service: crow
+  name: crow
+  namespace: kaiser
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      io.kompose.service: crow
+  strategy: {}
+  template:
+    metadata:
+      annotations:
+        kompose.cmd: kompose convert
+        kompose.version: 1.26.1 (a9d05d509)
+      creationTimestamp: null
+      labels:
+        io.kompose.service: crow
+    spec:
+      imagePullSecrets:
+        - name: regcred
+      containers:
+        - env:
+            - name: MONGO_BASE_URI
+              valueFrom:
+                configMapKeyRef:
+                  name: crow-configmap
+                  key: MONGO_BASE_URI
+            - name: MONGO_PORT
+              valueFrom:
+                configMapKeyRef:
+                  name: crow-configmap
+                  key: MONGO_PORT
+            - name: MONGO_USERNAME
+              valueFrom:
+                configMapKeyRef:
+                  name: crow-configmap
+                  key: MONGO_USERNAME
+            - name: MONGO_DB_NAME
+              valueFrom:
+                configMapKeyRef:
+                  name: crow-configmap
+                  key: MONGO_DB_NAME
+            - name: MONGO_DEBUG
+              valueFrom:
+                configMapKeyRef:
+                  name: crow-configmap
+                  key: MONGO_DEBUG
+            - name: REDIS_HOST
+              valueFrom:
+                configMapKeyRef:
+                  name: crow-configmap
+                  key: REDIS_HOST
+            - name: REDIS_PORT
+              valueFrom:
+                configMapKeyRef:
+                  name: crow-configmap
+                  key: REDIS_PORT
+            - name: VAULT_HOST
+              valueFrom:
+                configMapKeyRef:
+                  name: crow-configmap
+                  key: VAULT_HOST
+            - name: VAULT_PORT
+              valueFrom:
+                configMapKeyRef:
+                  name: crow-configmap
+                  key: VAULT_PORT
+            - name: KAFKA_HOST
+              valueFrom:
+                configMapKeyRef:
+                  name: crow-configmap
+                  key: KAFKA_HOST
+            - name: KAFKA_PORT
+              valueFrom:
+                configMapKeyRef:
+                  name: crow-configmap
+                  key: KAFKA_PORT
+            - name: KAFKA_CLIENT_ID
+              valueFrom:
+                configMapKeyRef:
+                  name: crow-configmap
+                  key: KAFKA_CLIENT_ID
+            - name: KAFKA_GROUP_ID
+              valueFrom:
+                configMapKeyRef:
+                  name: crow-configmap
+                  key: KAFKA_GROUP_ID
+            - name: KEYCLOAK_BASE_URI
+              valueFrom:
+                configMapKeyRef:
+                  name: crow-configmap
+                  key: KEYCLOAK_BASE_URI
+            - name: KEYCLOAK_PORT
+              valueFrom:
+                configMapKeyRef:
+                  name: crow-configmap
+                  key: KEYCLOAK_PORT
+            - name: KEYCLOAK_REALM
+              valueFrom:
+                configMapKeyRef:
+                  name: crow-configmap
+                  key: KEYCLOAK_REALM
+            - name: KEYCLOAK_GRANT_TYPE
+              valueFrom:
+                configMapKeyRef:
+                  name: crow-configmap
+                  key: KEYCLOAK_GRANT_TYPE
+#=================================================================================================================
+            - name: MONGO_PASSWORD
+              valueFrom:
+                secretKeyRef:
+                  name: crow-secrets
+                  key: MONGO_PASSWORD
+            - name: REDIS_PASSWORD
+              valueFrom:
+                secretKeyRef:
+                  name: crow-secrets
+                  key: REDIS_PASSWORD
+            - name: VAULT_ROOT_TOKEN
+              valueFrom:
+                secretKeyRef:
+                  name: crow-secrets
+                  key: VAULT_ROOT_TOKEN
+            - name: VAULT_TOKEN_PATH
+              valueFrom:
+                secretKeyRef:
+                  name: crow-secrets
+                  key: VAULT_TOKEN_PATH
+            - name: VAULT_KEYS_PATH
+              valueFrom:
+                secretKeyRef:
+                  name: crow-secrets
+                  key: VAULT_KEYS_PATH
+            - name: KEYCLOAK_CLIENT_ACCOUNT_ID
+              valueFrom:
+                secretKeyRef:
+                  name: crow-secrets
+                  key: KEYCLOAK_CLIENT_ACCOUNT_ID
+            - name: KEYCLOAK_CLIENT_ID
+              valueFrom:
+                secretKeyRef:
+                  name: crow-secrets
+                  key: KEYCLOAK_CLIENT_ID
+            - name: KEYCLOAK_LOCAL_CLIENT_ID
+              valueFrom:
+                secretKeyRef:
+                  name: crow-secrets
+                  key: KEYCLOAK_LOCAL_CLIENT_ID
+            - name: KEYCLOAK_USERNAME
+              valueFrom:
+                secretKeyRef:
+                  name: crow-secrets
+                  key: KEYCLOAK_USERNAME
+            - name: KEYCLOAK_PASSWORD
+              valueFrom:
+                secretKeyRef:
+                  name: crow-secrets
+                  key: KEYCLOAK_PASSWORD
+          image: '10.1.0.14:8081/comfortech/crow:v1.0'
+          name: crow
+          ports:
+            - containerPort: 5000
+          resources: {}
+      restartPolicy: Always
+status: {}

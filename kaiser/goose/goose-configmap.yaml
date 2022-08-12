@@ -1,0 +1,17 @@
+apiVersion: v1
+data:
+  REDIS_HOST: "127.0.0.1"
+  REDIS_PORT: "6379"
+  KAFKA_HOST: "localhost"
+  KAFKA_PORT: "9092"
+  KAFKA_CLIENT_ID: "goose-consumer"
+  KAFKA_GROUP_ID: "goose-consumer"
+  MQTT_HOST: "localhost"
+  MQTT_PORT: "1883"
+
+kind: ConfigMap
+metadata:
+  labels:
+    io.kompose.service: goose-service
+  name: goose-configmap
+  namespace: kaiser

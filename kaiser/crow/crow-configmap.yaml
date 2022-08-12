@@ -1,0 +1,26 @@
+apiVersion: v1
+data:
+  MONGO_BASE_URI: "mongodb://localhost"
+  MONGO_PORT: "27017"
+  MONGO_USERNAME: "user"
+  MONGO_DB_NAME: "comfortech"
+  MONGO_DEBUG: "true"
+  REDIS_HOST: "127.0.0.1"
+  REDIS_PORT: "6379"
+  VAULT_HOST: "http://localhost"
+  VAULT_PORT: "8200"
+  KAFKA_HOST: "localhost"
+  KAFKA_PORT: "9092"
+  KAFKA_CLIENT_ID: "comfortech-dataland"
+  KAFKA_GROUP_ID: "comfortech-dataland"
+  KEYCLOAK_BASE_URI: "http://localhost"
+  KEYCLOAK_PORT: "8080"
+  KEYCLOAK_REALM: "master"
+  KEYCLOAK_GRANT_TYPE: "password"
+
+kind: ConfigMap
+metadata:
+  labels:
+    io.kompose.service: crow-service
+  name: crow-configmap
+  namespace: kaiser

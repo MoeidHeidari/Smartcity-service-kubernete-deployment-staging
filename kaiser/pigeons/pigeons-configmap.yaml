@@ -1,0 +1,15 @@
+apiVersion: v1
+data:
+  REDIS_HOST: "value"
+  REDIS_PORT: "value"
+  KAFKA_HOST: "value"
+  KAFKA_PORT: "value"
+  KAFKA_CLIENT_ID: "value"
+  KAFKA_GROUP_ID: "value"
+
+kind: ConfigMap
+metadata:
+  labels:
+    io.kompose.service: pigeons-service
+  name: pigeons-configmap
+  namespace: kaiser
