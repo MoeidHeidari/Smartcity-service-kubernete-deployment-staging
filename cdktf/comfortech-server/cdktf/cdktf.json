@@ -3,7 +3,9 @@
   "app": "npx ts-node main.ts",
   "projectId": "731fa759-2de0-4a5d-b185-605618e0acc1",
   "sendCrashReports": "false",
-  "terraformProviders": ["kubernetes"],
+  "terraformProviders": [
+    "kubernetes@~> 2.0"
+  ],
   "terraformModules": [],
   "context": {
     "excludeStackIdFromLogicalIds": "true",
