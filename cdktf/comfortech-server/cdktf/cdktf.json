@@ -4,7 +4,8 @@
   "projectId": "731fa759-2de0-4a5d-b185-605618e0acc1",
   "sendCrashReports": "false",
   "terraformProviders": [
-    "kubernetes@~> 2.0"
+    "kubernetes@~> 2.0",
+    "hashicorp/helm@ ~> 2.1.2"
   ],
   "terraformModules": [],
   "context": {

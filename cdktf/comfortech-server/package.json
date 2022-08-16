@@ -1,5 +1,6 @@
 {
   "dependencies": {
+    "@cdktf/provider-helm": "^2.0.20",
     "cdktf-cli": "^0.12.0"
   }
 }
