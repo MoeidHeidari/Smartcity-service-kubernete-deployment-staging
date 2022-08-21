@@ -13,7 +13,7 @@ class MyStack extends TerraformStack {
   // Kafka
   kafka_helm: Release;
   // keycloak
-  keycloak_helm: Release;
+  //keycloak_helm: Release;
   // mongodb
   mongodb_helm: Release;
   // redis
@@ -26,9 +26,23 @@ class MyStack extends TerraformStack {
   pyrador_secret: kubernetes.Secret
   pyrador_service: kubernetes.Service
   // iguana
+  iguana_deployment: kubernetes.Deployment
+  iguana_configmap: kubernetes.ConfigMap
+  iguana_secret: kubernetes.Secret
+  iguana_service: kubernetes.Service
   // zoo
+  zoo_deployment: kubernetes.Deployment
+  zoo_configmap: kubernetes.ConfigMap
+  zoo_secret: kubernetes.Secret
+  zoo_service: kubernetes.Service
   // goos
+  goos_deployment: kubernetes.Deployment
+  goos_configmap: kubernetes.ConfigMap
+  goos_secret: kubernetes.Secret
   // pigeons
+  pigeons_deployment: kubernetes.Deployment
+  pigeons_configmap: kubernetes.ConfigMap
+  pigeons_secret: kubernetes.Secret
   // crow
   crow_deployment: kubernetes.Deployment
   crow_configmap: kubernetes.ConfigMap
@@ -109,24 +123,6 @@ class MyStack extends TerraformStack {
 
     })
     //-------------------------------------------------------------------------------------------------------------------
-    this.keycloak_helm = new Release(this, 'keycloak', {
-      
-      name: "keycloak",
-      repository: "https://charts.bitnami.com/bitnami",
-      chart: "keycloak",
-      version: "9.6.8",
-      set: [
-        {
-          name: 'auth.adminPassword',
-          value: `PoI456ZxC`
-        },
-        {
-          name: 'postgresql.auth.password',
-          value: `PoI456ZxC`
-        }
-      ]
-
-    })
     //-------------------------------------------------------------------------------------------------------------------
     this.kaiser_namespace = new kubernetes.Namespace(this, 'kaiser', {
       metadata: {
@@ -185,20 +181,6 @@ class MyStack extends TerraformStack {
     })
     //-------------------------------------------------------------------------------------------------------------------
     this.pyrador_deployment = new kubernetes.Deployment(this, 'pyradorDeplyment', {
-      dependsOn:[
-        {
-          fqn:'pyrador-configmap'
-        },
-        {
-          fqn:'pyrador-secret'
-        },
-        {
-          fqn:'kafka'
-        },
-        {
-          fqn:'redis'
-        }
-      ],
       metadata: {
         annotations: {
           'kompose.cmd': 'kompose convert',
@@ -371,6 +353,7 @@ class MyStack extends TerraformStack {
           },
 
         ],
+        type:"LoadBalancer",
         selector: { "io.kompose.service": "pyrador" }
       }
     })
@@ -397,9 +380,9 @@ class MyStack extends TerraformStack {
         'KAFKA_PORT': '9092',
         'KAFKA_CLIENT_ID': 'comfortech-dataland',
         'KAFKA_GROUP_ID': 'comfortech-dataland',
-        'KEYCLOAK_BASE_URI': 'http://keycloak"',
+        'KEYCLOAK_BASE_URI': 'https://auth.techpal.ru',
         'KEYCLOAK_PORT': '8080',
-        'KEYCLOAK_REALM': 'master',
+        'KEYCLOAK_REALM': 'comfortech_staging',
         'KEYCLOAK_GRANT_TYPE': 'password'
       }
     });
@@ -415,35 +398,16 @@ class MyStack extends TerraformStack {
         'VAULT_ROOT_TOKEN': 'bm90aGluZw==',
         'VAULT_TOKEN_PATH': 'dmF1bHQvZGF0YS92YXVsdF9yb290X3Rva2VuLmtleQ==',
         'VAULT_KEYS_PATH': 'dmF1bHQvZGF0YS9zZWFsaW5nX2tleXMua2V5',
-        'KEYCLOAK_CLIENT_ACCOUNT_ID': 'MTUyYzlmZjMtMjAxMC00NDQ5LTllOTMtZmUwOTdkNjNjYTBi',
+        'KEYCLOAK_CLIENT_ACCOUNT_ID': '0d68a12c-7e3e-4995-8604-bc7eb3327fd4',
         'KEYCLOAK_CLIENT_ID': 'admin-cli',
         'KEYCLOAK_LOCAL_CLIENT_ID': 'comfortech',
-        'KEYCLOAK_USERNAME': 'user',
+        'KEYCLOAK_USERNAME': 'admin',
         'KEYCLOAK_PASSWORD': 'PoI456ZxC',
       }
     });
 
     this.crow_deployment = new kubernetes.Deployment(this, 'crowDeployment', {
-      dependsOn:[
-        {
-          fqn:'crow-configmap'
-        },
-        {
-          fqn:'crow-secret'
-        },
-        {
-          fqn:'kafka'
-        },
-        {
-          fqn:'redis'
-        },
-        {
-          fqn:'mongodb'
-        },
-        {
-          fqn:'keycloak'
-        }
-      ],
+      
       metadata: {
         name: "crow",
         annotations:{
@@ -472,6 +436,14 @@ class MyStack extends TerraformStack {
             }
           },
           spec:{
+            hostAliases:[
+              {
+                ip:'10.1.0.8',
+                hostnames:[
+                  "auth.techpal.ru"
+                ]
+              }
+            ],
             imagePullSecrets:[
               {
                 name:'regcred'
@@ -778,7 +750,7 @@ class MyStack extends TerraformStack {
                     }
                   }
                 ],
-                image:'10.1.0.14:8081/comfortech/crow:v1.0',
+                image:'10.1.0.14:8081/comfortech/crow_develop:v74',
                 name:'crow'              
               }
             ],
