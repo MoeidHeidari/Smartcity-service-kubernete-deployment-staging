@@ -31,18 +31,18 @@ class MyStack extends TerraformStack {
   iguana_secret: kubernetes.Secret
   iguana_service: kubernetes.Service
   // zoo
-  zoo_deployment: kubernetes.Deployment
-  zoo_configmap: kubernetes.ConfigMap
-  zoo_secret: kubernetes.Secret
-  zoo_service: kubernetes.Service
-  // goos
-  goos_deployment: kubernetes.Deployment
-  goos_configmap: kubernetes.ConfigMap
-  goos_secret: kubernetes.Secret
-  // pigeons
-  pigeons_deployment: kubernetes.Deployment
-  pigeons_configmap: kubernetes.ConfigMap
-  pigeons_secret: kubernetes.Secret
+  // zoo_deployment: kubernetes.Deployment
+  // zoo_configmap: kubernetes.ConfigMap
+  // zoo_secret: kubernetes.Secret
+  // zoo_service: kubernetes.Service
+  // // goos
+  // goos_deployment: kubernetes.Deployment
+  // goos_configmap: kubernetes.ConfigMap
+  // goos_secret: kubernetes.Secret
+  // // pigeons
+  // pigeons_deployment: kubernetes.Deployment
+  // pigeons_configmap: kubernetes.ConfigMap
+  // pigeons_secret: kubernetes.Secret
   // crow
   crow_deployment: kubernetes.Deployment
   crow_configmap: kubernetes.ConfigMap
@@ -760,45 +760,205 @@ class MyStack extends TerraformStack {
       }
     })
     //-------------------------------------------------------------------------------------------------------------------
+    this.iguana_configmap=new kubernetes.ConfigMap(this,'iguana-configmap',{
+      metadata:{
+        labels:{
+          "io.kompose.service":"iguana-service"
+        },
+        name:"iguana-configmap",
+        namespace:this.namespace
+      },
+      data:{
+        'App_PORT':'2000',
+        'REDIS_HOST':'redis',
+        'REDIS_PORT':this.redis_helm.set.get(0).value,
+        'KAFKA_HOST':'kafka',
+        'KAFKA_PORT': '9092',
+        'KAFKA_CLIENT_ID':'iguana',
+        'KAFKA_GROUP_ID':'iguana'
+      }
+    })
+    //-------------------------------------------------------------------------------------------------------------------
+    this.iguana_secret=new kubernetes.Secret(this,'iguana-secret',{
+      metadata:{
+        name:'iguana-secret',
+        namespace:this.namespace
+      },
+      type:'Opaque',
+      data:{
+        'AUTH_KEY':'TUlJQklqQU5CZ2txaGtpRzl3MEJBUUVGQUFPQ0FROEFNSUlCQ2dLQ0FRRUF5ZFlZM2o2Skh3Qmd2aUZOd1o2bit0aHg5ZURjNTQ3VFJ1RlZySUNiZ3FPL3BjazZBb1FGTGZBWlB0azhZaHZtcVdjVWt0b1AwdUd2MXlkSWFSY1l4QVVGK29zZW1iWUlpc0h3cGh3K1lJaFJZdnFsbU5PeGNjd21nU0lFNlRpTlBjNFNVcDNrSG03aFdaRU9QY3VoREVzNEVTYWdyTGRCR2U1Qnl0dVhrZGNCUTVpeXFRU3lwdHlOY1I4enEzdGZ5cE9hbzZZckwzeWFRMjJaOEQvclVWRDA5SkNUUzBFaWdsT3c0S1M2TlJ0V05UeDhJdE1JMEZScWpLcWxqZDR2b1dEVm1rOTA2QzRjN0psV29VdG1QVDB4ZndYRlErN1A4bldWbXNJQ0VGYjRDN3ZzRlVKT2Jld2Q2cWZyY2MvRVdNOEtpZE9wUldjOGN6UHZEQkUwZlFJREFRQUI=',
+        'REDIS_PASSWORD': 'UTzVGyKGcq',
+      }
+    })
+    //-------------------------------------------------------------------------------------------------------------------
+    this.iguana_deployment=new kubernetes.Deployment(this,'iguana-deployment',{
+      metadata: {
+        annotations: {
+          'kompose.cmd': 'kompose convert',
+          'kompose.version': '1.26.1 (a9d05d509)'
+        },
+        labels: {
+          'io.kompose.service': 'iguana'
+        },
+        name: 'iguana',
+        namespace: this.namespace
+      },
+      spec:{
+        replicas: '1',
+        selector: {
+          matchLabels: {
+            'io.kompose.service': 'iguana'
+          }
+        },
+        template:{
+          metadata: {
+            annotations: {
+              'kompose.cmd': 'kompose convert',
+              'kompose.version': '1.26.1 (a9d05d509)'
+            },
+            labels: {
+              'io.kompose.service': 'iguana'
+            }
+          },
+          spec:{
+            imagePullSecrets: [
+              {
+                name: 'regcred'
+              }
+            ],
+            container:[
+              {
+              env:[
+                {
+                  name: 'App_PORT',
+                  valueFrom: {
+                    configMapKeyRef:
+                    {
+                      name: 'iguana-configmap',
+                      key: 'APP_PORT'
+                    }
+                  }
+                },
+                {
+                  name: 'REDIS_HOST',
+                  valueFrom: {
+                    configMapKeyRef:
+                    {
+                      name: 'iguana-configmap',
+                      key: 'REDIS_HOST'
+                    }
+                  }
+                },
+                {
+                  name: 'REDIS_PORT',
+                  valueFrom: {
+                    configMapKeyRef:
+                    {
+                      name: 'iguana-configmap',
+                      key: 'REDIS_PORT'
+                    }
+                  }
+                },
+                {
+                  name: 'KAFKA_HOST',
+                  valueFrom: {
+                    configMapKeyRef:
+                    {
+                      name: 'iguana-configmap',
+                      key: 'KAFKA_HOST'
+                    }
+                  }
+                },
+                {
+                  name: 'KAFKA_PORT',
+                  valueFrom: {
+                    configMapKeyRef:
+                    {
+                      name: 'iguana-configmap',
+                      key: 'KAFKA_PORT'
+                    }
+                  }
+                },
+                {
+                  name: 'KAFKA_CLIENT_ID',
+                  valueFrom: {
+                    configMapKeyRef:
+                    {
+                      name: 'iguana-configmap',
+                      key: 'KAFKA_CLIENT_ID'
+                    }
+                  }
+                },
+                {
+                  name: 'KAFKA_GROUP_ID',
+                  valueFrom: {
+                    configMapKeyRef:
+                    {
+                      name: 'iguana-configmap',
+                      key: 'KAFKA_GROUP_ID'
+                    }
+                  }
+                },
+                {
+                  name: 'AUTH_KEY',
+                  valueFrom: {
+                    secretKeyRef:
+                    {
+                      name: 'iguana-secret',
+                      key: 'AUTH_KEY'
+                    }
+                  }
+                },
+                {
+                  name: 'REDIS_PASSWORD',
+                  valueFrom: {
+                    secretKeyRef:
+                    {
+                      name: 'iguana-secret',
+                      key: 'REDIS_PASSWORD'
+                    }
+                  }
+                },
+              ],
+              image:'10.1.0.14:8081/comfortech/iguana_develop:v61',
+              name:'iguana',
+              port: [
+                {
+                  containerPort: 2000
+                }
+              ]
+              }
+            ],
+          }
+        }
+      }
+    })
+    //-------------------------------------------------------------------------------------------------------------------
+    this.iguana_service=new kubernetes.Service(this,'iguana-service',{
+      metadata: {
+        name: 'iguana-service',
+        annotations: {
+          "kompose.cmd": "kompose convert",
+          "kompose.version": "1.26.1 (a9d05d509)"
+        },
+        labels: {
+          "io.kompose.service": "iguana"
+        }
+      },
+      spec: {
+        port: [
+          {
+            name: "2000",
+            port: 2001,
+            targetPort: "2000"
+          },
 
-    // this.app1=new kubernetes.Deployment(this, 'deployment', {
-    //   metadata: {
-
-    //     labels: {
-    //       app: 'myapp',
-    //       component: 'frontend',
-    //       environment: 'dev',
-    //     },
-    //     name: 'myapp',
-    //   },
-    //   spec: {
-    //     replicas: '1',
-    //     selector: {
-    //       matchLabels: {
-    //         app: 'myapp',
-    //         component: 'frontend',
-    //         environment: 'dev',
-    //       },
-    //     },
-    //     template: {
-    //       metadata: {
-    //         labels: {
-    //           app: 'myapp',
-    //           component: 'frontend',
-    //           environment: 'dev',
-    //         },
-    //       },
-    //       spec: {
-    //         container: [
-    //           {
-    //             image: 'nginx:latest',
-    //             name: 'frontend',
-    //           },
-    //         ],
-    //       },
-    //     },
-    //   },
-    // })
+        ],
+        type:"LoadBalancer",
+        selector: { "io.kompose.service": "iguana" }
+      }
+    })
+    
 
     // define resources here
   }
