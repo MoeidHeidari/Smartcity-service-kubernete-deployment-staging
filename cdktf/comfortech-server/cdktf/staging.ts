@@ -9,11 +9,9 @@ class MyStack extends TerraformStack {
   namespace = "default";
   regCred: kubernetes.Secret
   kaiser_namespace: kubernetes.Namespace;
-  pvs:kubernetes.PersistentVolume[]
   // ============================================================third parties==========================================================================
   // Kafka
   kafka_helm: Release;
-  
   // keycloak
   //keycloak_helm: Release;
   ingress_controller_helm: Release;
@@ -30,14 +28,14 @@ class MyStack extends TerraformStack {
   pyrador_secret: kubernetes.Secret
   pyrador_service: kubernetes.Service
   pyrador_ingress:kubernetes.IngressV1
-  pyrador_ingress_DNS_record='auth.dipal.ru'
+  pyrador_ingress_DNS_record='develop.auth.dipal.ru'
   // iguana
   iguana_deployment: kubernetes.Deployment
   iguana_configmap: kubernetes.ConfigMap
   iguana_secret: kubernetes.Secret
   iguana_service: kubernetes.Service
   iguana_ingress: kubernetes.IngressV1
-  iguana_ingress_DNS_record='dipal.ru'
+  iguana_ingress_DNS_record='develop.dipal.ru'
   // zoo
   // zoo_deployment: kubernetes.Deployment
   // zoo_configmap: kubernetes.ConfigMap
@@ -60,19 +58,17 @@ class MyStack extends TerraformStack {
 
   constructor(scope: Construct, name: string) {
     super(scope, name);
-    this.pvs=new Array<kubernetes.PersistentVolume>()
     new kubernetes.KubernetesProvider(this, 'kind', {
-      configPath: path.join(__dirname, './kubeconfig_prod.yaml'),
+      configPath: path.join(__dirname, './kubeconfig.yaml'),
     })
     //-------------------------------------------------------------------------------------------------------------------
     new HelmProvider(this, 'helm', {
       kubernetes:
       {
-        configPath: path.join(__dirname, './kubeconfig_prod.yaml'),
+        configPath: path.join(__dirname, './kubeconfig.yaml'),
       }
 
     })
-
     //-------------------------------------------------------------------------------------------------------------------
     this.redis_helm = new Release(this, 'redis', {
       name: "redis",
@@ -107,48 +103,6 @@ class MyStack extends TerraformStack {
       ]
 
     })
-    //-------------------------------------------------------------------------------------------------------------------
-    for (let index = 0; index < 15; index++) {
-      
-      const pv: kubernetes.PersistentVolume=new kubernetes.PersistentVolume(this,'redis-pv'+index,{
-        metadata:{
-          name:'redis-pv'+index
-        },
-        spec:[
-          {
-            capacity:{
-              'storage':'10Gi'
-            },
-            accessModes:[
-              'ReadWriteOnce'
-            ],
-            persistentVolumeReclaimPolicy:'Delete',
-            persistentVolumeSource:{
-              local:{
-                path:'home/ubuntu/storage/pv'+index
-              }
-            },
-            nodeAffinity:{
-              required:{
-                nodeSelectorTerm:[
-                  {
-                    matchExpressions:[
-                      {
-                        key:'kubernetes.io/hostname',
-                        values:['kaiser-master'],
-                        operator:'In'
-                      }
-                    ]
-                  }
-                ]
-              }
-            }
-  
-          }
-        ]
-      })
-      this.pvs.push(pv);
-    }
     //-------------------------------------------------------------------------------------------------------------------
     this.kafka_helm = new Release(this, 'kafka', {
       name: "kafka",
@@ -1711,5 +1665,5 @@ class MyStack extends TerraformStack {
 }
 
 const app = new App();
-new MyStack(app, "comfortech_prod");
+new MyStack(app, "comfortech_staging");
 app.synth();
