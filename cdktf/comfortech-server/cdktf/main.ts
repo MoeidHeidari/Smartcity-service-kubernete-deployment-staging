@@ -125,7 +125,7 @@ class MyStack extends TerraformStack {
             persistentVolumeReclaimPolicy:'Delete',
             persistentVolumeSource:{
               local:{
-                path:'home/ubuntu/storage/pv'+index
+                path:'/home/ubuntu/storage/pv'+index
               }
             },
             nodeAffinity:{
