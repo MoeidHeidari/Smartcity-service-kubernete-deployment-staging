@@ -4,7 +4,7 @@ import * as kubernetes from "@cdktf/provider-kubernetes"
 import { HelmProvider } from "./.gen/providers/helm";
 import * as path from "path"
 import { Release } from "./.gen/providers/helm";
-class MyStack extends TerraformStack {
+class StagingStack extends TerraformStack {
   //app1: kubernetes.Deployment;
   namespace = "default";
   regCred: kubernetes.Secret
@@ -1665,5 +1665,5 @@ class MyStack extends TerraformStack {
 }
 
 const app = new App();
-new MyStack(app, "comfortech_staging");
+new StagingStack(app, "comfortech_staging");
 app.synth();
