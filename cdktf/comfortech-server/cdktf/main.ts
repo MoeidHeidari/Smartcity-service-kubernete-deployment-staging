@@ -628,7 +628,7 @@ class ProdStack extends TerraformStack {
                     }
                   }
                 ],
-                image: '10.1.0.14:8081/comfortech/pyrador_develop:v28',
+                image: '10.1.0.14:8081/comfortech/pyrador_develop:v30',
                 name: 'pyrador',
                 port: [
                   {
@@ -725,7 +725,10 @@ class ProdStack extends TerraformStack {
         'KEYCLOAK_BASE_URI': 'https://auth.techpal.ru',
         'KEYCLOAK_PORT': '8080',
         'KEYCLOAK_REALM': 'comfortech_production',
-        'KEYCLOAK_GRANT_TYPE': 'password'
+        'KEYCLOAK_GRANT_TYPE': 'password',
+        'NEXT_TRY_TIME': '60000',
+        'OTP_EXPIRATION_TIME': '60000',
+        'BILLING_BASE_URL':'https://api.uut-telecom.ru/api/v1.0'
       }
     });
     //-------------------------------------------------------------------------------------------------------------------
@@ -746,6 +749,7 @@ class ProdStack extends TerraformStack {
         'KEYCLOAK_LOCAL_CLIENT_ID': 'comfortech',
         'KEYCLOAK_USERNAME': 'admin',
         'KEYCLOAK_PASSWORD': 'PoI456ZxC',
+        'SECURITY_KEY':'971ebba1602e952acd7a549ca3826e41',
       }
     });
     //-------------------------------------------------------------------------------------------------------------------
@@ -972,6 +976,39 @@ class ProdStack extends TerraformStack {
                     }
                   },
                   {
+                    name: 'NEXT_TRY_TIME',
+                    valueFrom: {
+                      configMapKeyRef:
+                      {
+                        name: 'crow-configmap',
+                        key: 'NEXT_TRY_TIME'
+                      }
+
+                    }
+                  },
+                  {
+                    name: 'OTP_EXPIRATION_TIME',
+                    valueFrom: {
+                      configMapKeyRef:
+                      {
+                        name: 'crow-configmap',
+                        key: 'OTP_EXPIRATION_TIME'
+                      }
+
+                    }
+                  },
+                  {
+                    name: 'BILLING_BASE_URL',
+                    valueFrom: {
+                      configMapKeyRef:
+                      {
+                        name: 'crow-configmap',
+                        key: 'BILLING_BASE_URL'
+                      }
+
+                    }
+                  },
+                  {
                     name: 'KEYCLOAK_GRANT_TYPE',
                     valueFrom: {
                       configMapKeyRef:
@@ -1082,6 +1119,17 @@ class ProdStack extends TerraformStack {
                     }
                   },
                   {
+                    name: 'SECURITY_KEY',
+                    valueFrom: {
+                      secretKeyRef:
+                      {
+                        name: 'crow-secret',
+                        key: 'SECURITY_KEY'
+                      }
+
+                    }
+                  },
+                  {
                     name: 'KEYCLOAK_PASSWORD',
                     valueFrom: {
                       secretKeyRef:
@@ -1093,7 +1141,7 @@ class ProdStack extends TerraformStack {
                     }
                   }
                 ],
-                image:'10.1.0.14:8081/comfortech/crow_develop:v74',
+                image:'10.1.0.14:8081/comfortech/crow_develop:v88',
                 name:'crow'              
               }
             ],
@@ -1263,7 +1311,7 @@ class ProdStack extends TerraformStack {
                   }
                 },
               ],
-              image:'10.1.0.14:8081/comfortech/iguana_develop:v63',
+              image:'10.1.0.14:8081/comfortech/iguana_develop:v64',
               name:'iguana',
               port: [
                 {
@@ -1535,7 +1583,8 @@ class ProdStack extends TerraformStack {
         'KAFKA_HOST':'kafka',
         'KAFKA_PORT': '9092',
         'KAFKA_CLIENT_ID':'pigeons',
-        'KAFKA_GROUP_ID':'pigeons'
+        'KAFKA_GROUP_ID':'pigeons',
+        'NODE_TLS_REJECT_UNAUTHORIZED':'0'
       }
     })
     //-------------------------------------------------------------------------------------------------------------------
@@ -1552,9 +1601,9 @@ class ProdStack extends TerraformStack {
         'EMAIL_PASS': 'orvavpirmuiqqrip',
         'EMAIL_HOST': 'smtp.yandex.ru',
         'EMAIL_PORT': '465',
-        'SMS_FROM': 'Comfortel',
-        'SMS_CLIENT_ID': '89fe0ac5340abcad6f51a67741dd36f0',
-        'SMS_SECRET': '3849c6e649c293795693a5c20c039553',
+        'SMS_BASE_URL': 'https://smpp.comfortel.pro:13013',
+        'SMS_PASS': 'Chuichi2aiti',
+        'SMS_USER': 'techpal',
         'SMS_SENDER': 'Comfortel',
         'FIREBASE_ACCOUNT_TYPE': 'service_account',
         'FIREBASE_ACCOUNT_PROJECT_ID': 'comfortech-12a15',
@@ -1677,6 +1726,18 @@ class ProdStack extends TerraformStack {
                     }
                   },
                   {
+                    name: 'NODE_TLS_REJECT_UNAUTHORIZED',
+                    valueFrom: {
+                      configMapKeyRef:
+                      {
+                        name: 'pigeons-configmap',
+                        key: 'NODE_TLS_REJECT_UNAUTHORIZED'
+                      }
+
+                    }
+                  },
+                  
+                  {
                     name: 'REDIS_PASSWORD',
                     valueFrom: {
                       secretKeyRef:
@@ -1743,34 +1804,12 @@ class ProdStack extends TerraformStack {
                     }
                   },
                   {
-                    name: 'SMS_FROM',
+                    name: 'SMS_BASE_URL',
                     valueFrom: {
                       secretKeyRef:
                       {
                         name: 'pigeons-secret',
-                        key: 'SMS_FROM'
-                      }
-
-                    }
-                  },
-                  {
-                    name: 'SMS_CLIENT_ID',
-                    valueFrom: {
-                      secretKeyRef:
-                      {
-                        name: 'pigeons-secret',
-                        key: 'SMS_CLIENT_ID'
-                      }
-
-                    }
-                  },
-                  {
-                    name: 'SMS_SECRET',
-                    valueFrom: {
-                      secretKeyRef:
-                      {
-                        name: 'pigeons-secret',
-                        key: 'SMS_SECRET'
+                        key: 'SMS_BASE_URL'
                       }
 
                     }
@@ -1782,6 +1821,28 @@ class ProdStack extends TerraformStack {
                       {
                         name: 'pigeons-secret',
                         key: 'SMS_SENDER'
+                      }
+
+                    }
+                  },
+                  {
+                    name: 'SMS_USER',
+                    valueFrom: {
+                      secretKeyRef:
+                      {
+                        name: 'pigeons-secret',
+                        key: 'SMS_USER'
+                      }
+
+                    }
+                  },
+                  {
+                    name: 'SMS_PASS',
+                    valueFrom: {
+                      secretKeyRef:
+                      {
+                        name: 'pigeons-secret',
+                        key: 'SMS_PASS'
                       }
 
                     }
@@ -1941,8 +2002,8 @@ class ProdStack extends TerraformStack {
                     }
                   },
                 ],
-                image:'10.1.0.14:8081/comfortech/pigeons_develop:v35',
-                name:'crow'              
+                image:'10.1.0.14:8081/comfortech/pigeons_develop:v38',
+                name:'pigeons'              
               }
             ],
             restartPolicy:'Always'
@@ -2565,7 +2626,7 @@ class StagingStack extends TerraformStack {
                     }
                   }
                 ],
-                image: '10.1.0.14:8081/comfortech/pyrador_develop:v28',
+                image: '10.1.0.14:8081/comfortech/pyrador_develop:v30',
                 name: 'pyrador',
                 port: [
                   {
@@ -2662,7 +2723,10 @@ class StagingStack extends TerraformStack {
         'KEYCLOAK_BASE_URI': 'https://auth.techpal.ru',
         'KEYCLOAK_PORT': '8080',
         'KEYCLOAK_REALM': 'comfortech_staging',
-        'KEYCLOAK_GRANT_TYPE': 'password'
+        'KEYCLOAK_GRANT_TYPE': 'password',
+        'NEXT_TRY_TIME': '60000',
+        'OTP_EXPIRATION_TIME': '60000',
+        'BILLING_BASE_URL':'https://api.uut-telecom.ru/api/v1.0'
       }
     });
     //-------------------------------------------------------------------------------------------------------------------
@@ -2683,6 +2747,8 @@ class StagingStack extends TerraformStack {
         'KEYCLOAK_LOCAL_CLIENT_ID': 'comfortech',
         'KEYCLOAK_USERNAME': 'admin',
         'KEYCLOAK_PASSWORD': 'PoI456ZxC',
+        'SECURITY_KEY':'971ebba1602e952acd7a549ca3826e41',
+        
       }
     });
     //-------------------------------------------------------------------------------------------------------------------
@@ -2909,6 +2975,39 @@ class StagingStack extends TerraformStack {
                     }
                   },
                   {
+                    name: 'NEXT_TRY_TIME',
+                    valueFrom: {
+                      configMapKeyRef:
+                      {
+                        name: 'crow-configmap',
+                        key: 'NEXT_TRY_TIME'
+                      }
+
+                    }
+                  },
+                  {
+                    name: 'OTP_EXPIRATION_TIME',
+                    valueFrom: {
+                      configMapKeyRef:
+                      {
+                        name: 'crow-configmap',
+                        key: 'OTP_EXPIRATION_TIME'
+                      }
+
+                    }
+                  },
+                  {
+                    name: 'BILLING_BASE_URL',
+                    valueFrom: {
+                      configMapKeyRef:
+                      {
+                        name: 'crow-configmap',
+                        key: 'BILLING_BASE_URL'
+                      }
+
+                    }
+                  },
+                  {
                     name: 'KEYCLOAK_GRANT_TYPE',
                     valueFrom: {
                       configMapKeyRef:
@@ -3019,6 +3118,17 @@ class StagingStack extends TerraformStack {
                     }
                   },
                   {
+                    name: 'SECURITY_KEY',
+                    valueFrom: {
+                      secretKeyRef:
+                      {
+                        name: 'crow-secret',
+                        key: 'SECURITY_KEY'
+                      }
+
+                    }
+                  },
+                  {
                     name: 'KEYCLOAK_PASSWORD',
                     valueFrom: {
                       secretKeyRef:
@@ -3030,7 +3140,7 @@ class StagingStack extends TerraformStack {
                     }
                   }
                 ],
-                image:'10.1.0.14:8081/comfortech/crow_develop:v74',
+                image:'10.1.0.14:8081/comfortech/crow_develop:v88',
                 name:'crow'              
               }
             ],
@@ -3200,7 +3310,7 @@ class StagingStack extends TerraformStack {
                   }
                 },
               ],
-              image:'10.1.0.14:8081/comfortech/iguana_develop:v63',
+              image:'10.1.0.14:8081/comfortech/iguana_develop:v64',
               name:'iguana',
               port: [
                 {
@@ -3472,7 +3582,8 @@ class StagingStack extends TerraformStack {
         'KAFKA_HOST':'kafka',
         'KAFKA_PORT': '9092',
         'KAFKA_CLIENT_ID':'pigeons',
-        'KAFKA_GROUP_ID':'pigeons'
+        'KAFKA_GROUP_ID':'pigeons',
+        'NODE_TLS_REJECT_UNAUTHORIZED':'0'
       }
     })
     //-------------------------------------------------------------------------------------------------------------------
@@ -3489,9 +3600,9 @@ class StagingStack extends TerraformStack {
         'EMAIL_PASS': 'orvavpirmuiqqrip',
         'EMAIL_HOST': 'smtp.yandex.ru',
         'EMAIL_PORT': '465',
-        'SMS_FROM': 'Comfortel',
-        'SMS_CLIENT_ID': '89fe0ac5340abcad6f51a67741dd36f0',
-        'SMS_SECRET': '3849c6e649c293795693a5c20c039553',
+        'SMS_BASE_URL': 'https://smpp.comfortel.pro:13013',
+        'SMS_PASS': 'Chuichi2aiti',
+        'SMS_USER': 'techpal',
         'SMS_SENDER': 'Comfortel',
         'FIREBASE_ACCOUNT_TYPE': 'service_account',
         'FIREBASE_ACCOUNT_PROJECT_ID': 'comfortech-12a15',
@@ -3614,6 +3725,17 @@ class StagingStack extends TerraformStack {
                     }
                   },
                   {
+                    name: 'NODE_TLS_REJECT_UNAUTHORIZED',
+                    valueFrom: {
+                      configMapKeyRef:
+                      {
+                        name: 'pigeons-configmap',
+                        key: 'NODE_TLS_REJECT_UNAUTHORIZED'
+                      }
+
+                    }
+                  },
+                  {
                     name: 'REDIS_PASSWORD',
                     valueFrom: {
                       secretKeyRef:
@@ -3680,34 +3802,12 @@ class StagingStack extends TerraformStack {
                     }
                   },
                   {
-                    name: 'SMS_FROM',
+                    name: 'SMS_BASE_URL',
                     valueFrom: {
                       secretKeyRef:
                       {
                         name: 'pigeons-secret',
-                        key: 'SMS_FROM'
-                      }
-
-                    }
-                  },
-                  {
-                    name: 'SMS_CLIENT_ID',
-                    valueFrom: {
-                      secretKeyRef:
-                      {
-                        name: 'pigeons-secret',
-                        key: 'SMS_CLIENT_ID'
-                      }
-
-                    }
-                  },
-                  {
-                    name: 'SMS_SECRET',
-                    valueFrom: {
-                      secretKeyRef:
-                      {
-                        name: 'pigeons-secret',
-                        key: 'SMS_SECRET'
+                        key: 'SMS_BASE_URL'
                       }
 
                     }
@@ -3719,6 +3819,28 @@ class StagingStack extends TerraformStack {
                       {
                         name: 'pigeons-secret',
                         key: 'SMS_SENDER'
+                      }
+
+                    }
+                  },
+                  {
+                    name: 'SMS_USER',
+                    valueFrom: {
+                      secretKeyRef:
+                      {
+                        name: 'pigeons-secret',
+                        key: 'SMS_USER'
+                      }
+
+                    }
+                  },
+                  {
+                    name: 'SMS_PASS',
+                    valueFrom: {
+                      secretKeyRef:
+                      {
+                        name: 'pigeons-secret',
+                        key: 'SMS_PASS'
                       }
 
                     }
@@ -3878,8 +4000,8 @@ class StagingStack extends TerraformStack {
                     }
                   },
                 ],
-                image:'10.1.0.14:8081/comfortech/pigeons_develop:v35',
-                name:'crow'              
+                image:'10.1.0.14:8081/comfortech/pigeons_develop:v38',
+                name:'pigeons'              
               }
             ],
             restartPolicy:'Always'
@@ -3891,11 +4013,11 @@ class StagingStack extends TerraformStack {
     // define resources here
   }
 }
-const stagingAPp = new App();
+const stagingApp = new App();
 const prodApp = new App();
 
-  new StagingStack(stagingAPp, "comfortech_staging");
+  new StagingStack(stagingApp, "comfortech_staging");
   new ProdStack(prodApp, "comfortech_prod");
 
-  stagingAPp.synth();
+  stagingApp.synth();
   prodApp.synth();
